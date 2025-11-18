@@ -13,10 +13,14 @@ from typing import Optional
 # ---------------------------
 # HARD-CODED API KEYS (backend uses these silently)
 # ---------------------------
-# Replace these if you want to rotate keys later
-OPENWEATHER_API_KEY = "4a84ffafff34c34d78f15fb5338d737c"
-TOMTOM_API_KEY = "T0MBRSNnFak4YAZWgHKgSCFsXUNjcSus"
-TICKETMASTER_API_KEY = "IEH6FGfZgmSrTzFrmnlDezsdNe0hhw3u"
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+TOMTOM_API_KEY = os.getenv("TOMTOM_API_KEY")
+TICKETMASTER_API_KEY = os.getenv("TICKETMASTER_API_KEY")
 # (Nominatim requires only a User-Agent header, no API key)
 
 # ---------------------------
