@@ -100,7 +100,7 @@ if st.button("🚀 Predict Demand Surge"):
                     [res["location"]["lat"], res["location"]["lng"]],
                     popup=f"Surge: {pred:.2f}",
                     tooltip=res["location"]["formatted_address"],
-                    icon=folium.Icon(color='red' if pred > 70 else 'orange' if pred > 40 else 'green')
+                    icon=folium.Icon(color='red' if pred > 100 else 'orange' if pred > 70 else 'green')
                 ).add_to(m)
                 folium_static(m, width=700, height=450)
         except requests.exceptions.Timeout:

@@ -10,9 +10,6 @@ from datetime import datetime
 import time
 from typing import Optional
 
-# ---------------------------
-# HARD-CODED API KEYS (backend uses these silently)
-# ---------------------------
 from dotenv import load_dotenv
 import os
 
@@ -35,15 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------
-# Load model & artifacts
-# Put your artifacts under ./model/
-# - model/lgbm_model.txt  OR  model/lgbm_model.pkl  (if saved via joblib)
-# - model/scaler.pkl
-# - model/label_encoders.pkl  (dict: col -> LabelEncoder)
-# - model/feature_columns.pkl  (list)
-# - model/categorical_columns.pkl (list)
-# ---------------------------
+
 model = None
 scaler = None
 label_encoders = {}
@@ -112,20 +101,34 @@ class PredictResponse(BaseModel):
 # ---------------------------
 def geocode_nominatim(address: str):
     """Return (lat, lon, display_name) or raise HTTPException"""
+
+    # Respect rate-limit BEFORE request
+    time.sleep(1)
+
     url = "https://nominatim.openstreetmap.org/search"
     params = {"q": address, "format": "json", "limit": 1}
-    headers = {"User-Agent": "DemandSurgeApp/1.0 (contact@example.com)"}
+    
+    headers = {
+        "User-Agent": "DemandSurgeApp/1.0 (ag3162517@gmail.com)"
+    }
+
     r = requests.get(url, params=params, headers=headers, timeout=10)
+
     if r.status_code != 200:
-        raise HTTPException(status_code=502, detail="Nominatim geocoding failed")
+        raise HTTPException(
+            status_code=502,
+            detail=f"Nominatim geocoding failed: {r.status_code} - {r.text}"
+        )
+
     data = r.json()
+
     if not data:
         raise HTTPException(status_code=400, detail="Could not geocode address")
-    # Respect rate-limit: 1 request per second recommended
-    time.sleep(1)
+
     lat = float(data[0]["lat"])
     lon = float(data[0]["lon"])
     display = data[0].get("display_name", "")
+
     return lat, lon, display
 
 def get_openweather(lat: float, lon: float):
